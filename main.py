@@ -1,16 +1,33 @@
-# This is a sample Python script.
+from flask import Flask, render_template, request, jsonify
+import pickle
+import numpy as np
 
-# Press Ctrl+F5 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+app = Flask(__name__)
 
+model = pickle.load(open("model/linear_model.pkl", "rb"))
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
+@app.route("/")
+def home():
+    return render_template("index.html")
 
+# API Endpoint
+@app.route("/predict", methods=["POST"])
+def predict():
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+    data = request.json
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    bedrooms = float(data['bedrooms'])
+    bathrooms = float(data['bathrooms'])
+    sqft = float(data['sqft'])
+    floors = float(data['floors'])
+
+    features = np.array([[bedrooms, bathrooms, sqft, floors]])
+
+    prediction = model.predict(features)[0]
+
+    return jsonify({
+        "predicted_price": round(prediction, 2)
+    })
+
+if __name__ == "__main__":
+    app.run(debug=True)
