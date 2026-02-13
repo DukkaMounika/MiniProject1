@@ -2,45 +2,54 @@
 <html>
 <head>
     <title>House Price Prediction</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .left-box { flex: 1; text-align: left; }
+        .middle-box { flex: 2; text-align: center; }
+        .right-box { flex: 1; text-align: right; }
+        .mounika-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #007bff;
+            object-fit: cover;
+        }
+        .form-section { display: flex; justify-content: center; gap: 15px; margin-top: 40px; }
+        input { padding: 10px; border-radius: 5px; border: 1px solid #ccc; width: 130px; }
+        button { padding: 10px 25px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>House Price Prediction</h2>
+    <div class="header-container">
+        <div class="left-box">
+            <h3>DUKKA MOUNIKA</h3>
+            <p style="color: green; font-size: 20px; font-weight: bold;">{{ prediction_text }}</p>
+        </div>
+        <div class="middle-box">
+            <h1>HOUSE PRICE PREDICTION</h1>
+        </div>
+        <div class="right-box">
+            <img src="{{ url_for('static', filename='mounika.jpg') }}" alt="Mounika" class="mounika-photo">
+        </div>
+    </div>
 
-    <input type="number" id="bedrooms" placeholder="Bedrooms">
-    <input type="number" id="bathrooms" placeholder="Bathrooms">
-    <input type="number" id="sqft" placeholder="Sqft Area">
-    <input type="number" id="floors" placeholder="Floors">
-
-    <button onclick="predictPrice()">Predict</button>
-
-    <h3 id="result"></h3>
-</div>
-
-<script>
-function predictPrice() {
-
-    const data = {
-        bedrooms: document.getElementById("bedrooms").value,
-        bathrooms: document.getElementById("bathrooms").value,
-        sqft: document.getElementById("sqft").value,
-        floors: document.getElementById("floors").value
-    };
-
-    fetch("/predict", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("result").innerText =
-            "Predicted Price: ₹ " + data.predicted_price;
-    });
-}
-</script>
+    <form action="/predict" method="post" class="form-section">
+        <input type="number" name="bedrooms" placeholder="Bedrooms" required>
+        <input type="number" name="bathrooms" placeholder="Bathrooms" required>
+        <input type="number" name="sqft_living" placeholder="Sqft Area" required>
+        <input type="number" name="floors" placeholder="Floors" required>
+        <button type="submit">Predict</button>
+    </form>
 
 </body>
 </html>

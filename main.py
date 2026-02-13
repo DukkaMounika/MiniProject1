@@ -1,33 +1,35 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 import pickle
 import numpy as np
 
 app = Flask(__name__)
 
-model = pickle.load(open("model/linear_model.pkl", "rb"))
 
-@app.route("/")
+# Load your manual model (if you saved it as a pickle)
+# model = pickle.load(open('model/linear_model.pkl', 'rb'))
+
+@app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template('index.html', prediction_text="Waiting...")
 
-# API Endpoint
-@app.route("/predict", methods=["POST"])
+
+@app.route('/predict', methods=['POST'])
 def predict():
+    try:
+        # Get data from the form
+        sqft = float(request.form['sqft_living'])
 
-    data = request.json
+        # USE YOUR MANUAL MATH HERE: y = m*x + c
+        # Example calculation:
+        m = 280.5  # Your calculated slope
+        c = 15000  # Your calculated C-value
+        price = (m * sqft) + c
 
-    bedrooms = float(data['bedrooms'])
-    bathrooms = float(data['bathrooms'])
-    sqft = float(data['sqft'])
-    floors = float(data['floors'])
+        return render_template('index.html',
+                               prediction_text=f"₹ {price:,.2f}")
+    except Exception as e:
+        return render_template('index.html', prediction_text="Error in Input")
 
-    features = np.array([[bedrooms, bathrooms, sqft, floors]])
-
-    prediction = model.predict(features)[0]
-
-    return jsonify({
-        "predicted_price": round(prediction, 2)
-    })
 
 if __name__ == "__main__":
     app.run(debug=True)
